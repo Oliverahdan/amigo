@@ -12,5 +12,13 @@
         Senha: <input type="password" name="senha"><br>
         <button type="submit">Entrar</button>
     </form>
+    <script>
+        function realizarLogin() {
+    // Lógica para autenticar o usuário, obter o userhost_id e armazenar
+    const userhost_id = obterUserHostId(); // Substitua com sua lógica de obtenção do ID
+    localStorage.setItem('userhost_id', userhost_id);
+    window.location.href = '/grupo'; // Redireciona para a página do grupo após o login
+}
+    </script>
 </body>
 </html>
