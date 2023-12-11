@@ -75,17 +75,6 @@ app.post('/login', (req, res) => {
   });
 });
 
-// Middleware para verificar autenticação
-const verificarAutenticacao = (req, res, next) => {
-  // Verificar se o usuário está autenticado
-  if (req.session.userhostId) {
-    // Se estiver autenticado, continue para a próxima rota
-    next();
-  } else {
-    // Se não estiver autenticado, redirecione para a página de login
-    res.redirect('/login');
-  }
-};
 
 // Rota para criar evento
 app.post('/api/criarevento', (req, res) => {
@@ -106,19 +95,20 @@ app.post('/api/criarevento', (req, res) => {
   
 // Rota para salvar participante
 app.post('/api/participants', (req, res) => {
-    const { nome, email } = req.body;
-    
-    const sql = 'INSERT INTO participants (nome, email) VALUES (?, ?)';
-    
-    connection.query(sql, [nome, email], (err, result) => {
-        if (err) {
-            console.error('Erro ao inserir participante:', err);
-            res.status(500).json({ error: 'Erro interno do servidor' });
-        } else {
-            res.status(201).json({ message: 'Participante cadastrado com sucesso' });
-        }
-    });
+  const { nome, email, userhost_id } = req.body;
+
+  // Inserir os dados do participante na tabela 'participants'
+  connection.query('INSERT INTO participants (nome, email, userhost_id) VALUES (?, ?, ?)', [nome, email, userhost_id], (err, results) => {
+    if (err) {
+      console.error('Erro ao inserir participante:', err);
+      return res.status(500).json({ message: 'Erro interno do servidor' });
+    }
+
+    // Participante inserido com sucesso
+    res.status(201).json({ message: 'Participante cadastrado com sucesso' });
+  });
 });
+
 
 // Rotas para as páginas HTML
 app.get('/', (req, res) => {
