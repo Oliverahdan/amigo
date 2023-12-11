@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem vindo ao amigo Secreto</title>
+</head>
+<body>
+    <h1>Bem vindo ao amigo Secreto</h1>
+    <h2>Insira o nome do evento</h2>
+    <input type="text">
+    <p>Insira a quantidade de participantes:</p>
+    <select>
+        <!-- Opções de 1 a 20 -->
+        <option value="1">1</option>
+        <!-- ... outras opções ... -->
+        <option value="20">20</option>
+    </select><br>
+    <button onclick="criarEvento()">Criar</button>
+    <p id="mensagem"></p>
+    <p>Envie o link para seus amigos/família: <span id="link"></span></p>
+    <button onclick="window.location.href='/participantes'">Ver participantes</button>
+
+    <script>
+        function criarEvento() {
+            document.getElementById("mensagem").innerText = "Evento criado com sucesso";
+            // Lógica para gerar e exibir o link
+            // Exemplo: document.getElementById("link").innerText = "http://seusite.com/evento123";
+        }
+    </script>
+</body>
+</html>
