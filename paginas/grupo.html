@@ -6,46 +6,55 @@
     <title>Bem vindo ao amigo Secreto</title>
     <!-- Inclui a biblioteca Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Adiciona a biblioteca do Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Bem vindo ao amigo Secreto</h1>
-    <h2>Insira o nome do evento</h2>
-    <input type="text" id="nomeEvento">
-    <p>Insira a quantidade de participantes:</p>
-    <select id="quantidadeParticipantes">
-        <!-- Opções de 1 a 20 -->
-        <option value="1">1</option>
-        <!-- ... outras opções ... -->
-        <option value="20">20</option>
-    </select><br>
-    <button onclick="criarEvento()">Criar</button>
-    <p id="mensagem"></p>
-    <p>Envie o link para seus amigos/família: <span id="link"></span></p>
-    <button onclick="window.location.href='/participantes'">Ver participantes</button>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="text-center">
+        <h1 class="text-3xl font-bold mb-4">Bem vindo ao amigo Secreto</h1>
+        <h2 class="text-xl mb-4">Insira o nome do evento</h2>
+        <input type="text" id="nomeEvento" class="border rounded px-2 py-1 mb-4">
+        <p>Insira a quantidade de participantes:</p>
+        <select id="quantidadeParticipantes" class="border rounded px-2 py-1 mb-4">
+            <!-- Opções de 1 a 20 -->
+            <option value="1">1</option>
+            <!-- ... outras opções ... -->
+            <option value="20">20</option>
+        </select><br>
+        <button onclick="criarEvento()" class="bg-blue-500 text-white px-4 py-2 rounded">Criar</button>
+        <p id="mensagem" class="mt-4"></p>
+        <p>Envie o link para seus amigos/família: <span id="link"></span></p>
+        <button onclick="window.location.href='/participantes'" class="bg-gray-300 text-gray-700 px-4 py-2 rounded">Ver participantes</button>
+    </div>
 
     <script>
         function criarEvento() {
-    const nomeEvento = document.getElementById('nomeEvento').value;
-    const quantidadeParticipantes = document.getElementById('quantidadeParticipantes').value;
+            const nomeEvento = document.getElementById('nomeEvento').value;
+            const quantidadeParticipantes = document.getElementById('quantidadeParticipantes').value;
 
-    // Recupera o userhost_id armazenado durante o login
-    const userhost_id = localStorage.getItem('userhost_id');
+            // Recupera o userhost_id armazenado durante o login
+            const userhost_id = localStorage.getItem('userhost_id');
 
-    axios.post('/api/criarevento', {
-        nome_evento: nomeEvento,
-        quantidade: quantidadeParticipantes,
-        userhost_id: userhost_id,
-    })
-    .then(response => {
-        console.log(response.data);
-        // Exibe a mensagem de sucesso
-        exibirMensagem('Evento criado com sucesso');
-    })
-    .catch(error => {
-        console.error('Erro ao criar evento:', error);
-        // Adicione aqui a lógica para lidar com o erro
-    });
-}
+            axios.post('/api/criarevento', {
+                nome_evento: nomeEvento,
+                quantidade: quantidadeParticipantes,
+                userhost_id: userhost_id,
+            })
+            .then(response => {
+                console.log(response.data);
+                // Exibe a mensagem de sucesso
+                exibirMensagem('Evento criado com sucesso');
+            })
+            .catch(error => {
+                console.error('Erro ao criar evento:', error);
+                // Adicione aqui a lógica para lidar com o erro
+            });
+        }
+
+        // Função para exibir mensagens na página
+        function exibirMensagem(mensagem) {
+            document.getElementById('mensagem').innerText = mensagem;
+        }
     </script>
 </body>
 </html>

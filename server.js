@@ -81,7 +81,8 @@ app.post('/api/sorteio', (req, res) => {
     participants.forEach(participant => {
       const destinatario = participant.email;
       const assunto = 'Resultado do Sorteio';
-      const corpo = `Você saiu com ${sorteio[participant.id]}`;
+      const destinatarioSorteado = participants.find(p => p.id === sorteio[participant.id]);
+      const corpo = `Você saiu com ${destinatarioSorteado.nome}`;
 
       enviarEmail(destinatario, assunto, corpo);
     });
@@ -91,11 +92,18 @@ app.post('/api/sorteio', (req, res) => {
   });
 });
 
-// Função para realizar o sorteio (exemplo simples)
+// Função para realizar o sorteio
 function sortear(participants) {
-  const sorteio = {};
+  const shuffledParticipants = [...participants]; // Para não modificar o array original
+  for (let i = shuffledParticipants.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledParticipants[i], shuffledParticipants[j]] = [shuffledParticipants[j], shuffledParticipants[i]];
+  }
 
-  // Lógica de sorteio aqui (pode ser mais complexa dependendo dos requisitos)
+  const sorteio = {};
+  for (let i = 0; i < shuffledParticipants.length; i++) {
+    sorteio[shuffledParticipants[i].id] = shuffledParticipants[(i + 1) % shuffledParticipants.length].id;
+  }
 
   return sorteio;
 }
