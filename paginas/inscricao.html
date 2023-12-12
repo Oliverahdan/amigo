@@ -4,38 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bem vindo ao amigo Secreto</title>
+    <!-- Inclui a biblioteca Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <h1>Bem vindo ao amigo Secreto</h1>
-    <form id="inscricaoForm">
-        Nome: <input type="text" name="nome" required><br>
-        Email: <input type="email" name="email" required><br>
+    <form id="inscricaoForm" action="/api/participants" method="post">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" required><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br>
         <button type="button" onclick="inscreverParticipante()">Inscrever</button>
     </form>
-    
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <script>
         function inscreverParticipante() {
-            const form = document.getElementById('inscricaoForm');
-            const nome = form.querySelector('input[name="nome"]').value;
-            const email = form.querySelector('input[name="email"]').value;
+            const nomeInput = document.getElementById('nome');
+            const emailInput = document.getElementById('email');
 
             // Verifica se os campos estão preenchidos
-            if (nome && email) {
-                const formData = new FormData(form);
+            if (nomeInput.checkValidity() && emailInput.checkValidity()) {
+                // Cria um objeto com os dados a serem enviados
+                const data = {
+                    nome: nomeInput.value,
+                    email: emailInput.value
+                };
 
-                axios.post('/api/participants', formData)
+                // Envia uma solicitação POST usando Axios
+                axios.post('/api/participants', data)
                     .then(response => {
                         console.log(response.data);
                         // Exibe a mensagem de cadastrado
                         alert('Participante cadastrado com sucesso');
+                        // Limpa os campos após o cadastro bem-sucedido
+                        nomeInput.value = '';
+                        emailInput.value = '';
                     })
                     .catch(error => {
                         console.error('Erro ao cadastrar participante:', error);
                         alert('Erro ao cadastrar participante. Por favor, tente novamente.');
                     });
             } else {
-                alert('Por favor, preencha todos os campos do formulário.');
+                alert('Por favor, preencha todos os campos do formulário corretamente.');
             }
         }
     </script>

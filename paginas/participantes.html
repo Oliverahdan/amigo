@@ -4,10 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bem vindo ao amigo Secreto</title>
+    <!-- Inclui a biblioteca Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <h1>Participantes</h1>
+    <ul id="listaParticipantes"></ul>
     <!-- Lógica para exibir participantes e botões para excluir -->
-<button onclick="window.location.href='sorteio.html'">sorteio</button>
+    <button onclick="realizarSorteio()">Sorteio</button>
+
+    <script>
+        function realizarSorteio() {
+            // Faz uma chamada ao servidor para realizar o sorteio
+            axios.post('/api/sorteio')
+                .then(response => {
+                    alert(response.data.message);
+                })
+                .catch(error => {
+                    console.error('Erro ao realizar sorteio:', error);
+                    alert('Erro ao realizar sorteio. Por favor, tente novamente.');
+                });
+        }
+
+        // Função para buscar e exibir os participantes
+        function carregarParticipantes() {
+            // Faz uma chamada ao servidor para buscar os participantes
+            axios.get('/api/participants')
+                .then(response => {
+                    const listaParticipantes = document.getElementById('listaParticipantes');
+
+                    // Limpa o conteúdo atual
+                    listaParticipantes.innerHTML = '';
+
+                    // Verifica se há participantes
+                    if (response.data.length > 0) {
+                        // Itera sobre os participantes e cria itens da lista
+                        response.data.forEach(participante => {
+                            const itemLista = document.createElement('li');
+                            itemLista.textContent = participante.nome;
+                            listaParticipantes.appendChild(itemLista);
+                        });
+                    } else {
+                        // Se não houver participantes, exibe uma mensagem
+                        const mensagemSemParticipantes = document.createElement('li');
+                        mensagemSemParticipantes.textContent = 'Nenhum participante encontrado.';
+                        listaParticipantes.appendChild(mensagemSemParticipantes);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar participantes:', error);
+                });
+        }
+
+        // Chama a função ao carregar a página
+        carregarParticipantes();
+    </script>
 </body>
 </html>

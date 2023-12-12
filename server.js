@@ -3,6 +3,7 @@ const path = require('path');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const port = 3001;
@@ -35,6 +36,69 @@ app.use(session({
   saveUninitialized: true,
 }));
 
+// Função para enviar e-mail
+function enviarEmail(destinatario, assunto, corpo) {
+  // Configurações do transporte de e-mail (usando Gmail como exemplo)
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'dos03042003@gmail.com',
+      pass: 'vpow fvyt ixjg crvq',
+    },
+  });
+
+  // Configurações do e-mail
+  const mailOptions = {
+    from: 'dos03042003@gmail.com',
+    to: destinatario,
+    subject: assunto,
+    text: corpo,
+  };
+
+  // Enviar o e-mail
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Erro ao enviar e-mail:', error);
+    } else {
+      console.log('E-mail enviado:', info.response);
+    }
+  });
+}
+
+// Rota para realizar sorteio e enviar e-mails
+app.post('/api/sorteio', (req, res) => {
+  // Consulta todos os participantes na tabela 'participants'
+  connection.query('SELECT * FROM participants', (err, participants) => {
+    if (err) {
+      console.error('Erro ao buscar participantes:', err);
+      return res.status(500).json({ message: 'Erro interno do servidor' });
+    }
+
+    // Realiza o sorteio (exemplo simples, pode ser mais complexo)
+    const sorteio = sortear(participants);
+
+    // Enviar e-mails para os participantes com os resultados do sorteio
+    participants.forEach(participant => {
+      const destinatario = participant.email;
+      const assunto = 'Resultado do Sorteio';
+      const corpo = `Você saiu com ${sorteio[participant.id]}`;
+
+      enviarEmail(destinatario, assunto, corpo);
+    });
+
+    // Retorna a mensagem de sucesso
+    res.status(200).json({ message: 'Sorteio realizado e e-mails enviados com sucesso' });
+  });
+});
+
+// Função para realizar o sorteio (exemplo simples)
+function sortear(participants) {
+  const sorteio = {};
+
+  // Lógica de sorteio aqui (pode ser mais complexa dependendo dos requisitos)
+
+  return sorteio;
+}
 // Rota para salvar usuário host
 app.post('/api/userhost', (req, res) => {
   const { nome, email, senha } = req.body;
@@ -95,19 +159,38 @@ app.post('/api/criarevento', (req, res) => {
   
 // Rota para salvar participante
 app.post('/api/participants', (req, res) => {
-  const { nome, email, userhost_id } = req.body;
+  const { nome, email } = req.body;
 
-  // Inserir os dados do participante na tabela 'participants'
-  connection.query('INSERT INTO participants (nome, email, userhost_id) VALUES (?, ?, ?)', [nome, email, userhost_id], (err, results) => {
+  // Verifique se os dados estão presentes
+  if (!nome || !email) {
+    return res.status(400).json({ message: 'Nome e email são obrigatórios.' });
+  }
+
+  // Insira os dados do participante na tabela 'participants'
+  connection.query('INSERT INTO participants (nome, email) VALUES (?, ?)', [nome, email], (err, results) => {
     if (err) {
       console.error('Erro ao inserir participante:', err);
+      return res.status(500).json({ message: 'Erro no servidor' });
+    }
+
+    return res.status(201).json({ message: 'Participante cadastrado com sucesso' });
+  });
+});
+
+// Rota para buscar participantes
+app.get('/api/participants', (req, res) => {
+  // Consulta todos os participantes na tabela 'participants'
+  connection.query('SELECT * FROM participants', (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar participantes:', err);
       return res.status(500).json({ message: 'Erro interno do servidor' });
     }
 
-    // Participante inserido com sucesso
-    res.status(201).json({ message: 'Participante cadastrado com sucesso' });
+    // Retorna a lista de participantes
+    res.status(200).json(results);
   });
 });
+
 
 
 // Rotas para as páginas HTML
@@ -132,7 +215,7 @@ app.get('/inscricao', (req, res) => {
 });
 
 app.get('/participantes', (req, res) => {
-    res.sendFile(path.join(__dirname, 'participantes.html'));
+    res.sendFile(path.join(__dirname, '/paginas/participantes.html'));
 });
 
 // Inicia o servidor na porta 3001
